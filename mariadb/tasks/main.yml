@@ -1,0 +1,64 @@
+- name: Install MariaDB server
+  apt:
+    name: mariadb-server
+    state: present
+    update_cache: yes
+
+- name: Install PyMySQL via apt
+  apt:
+    name: python3-pymysql
+    state: present
+    update_cache: yes
+
+- name: Ensure MariaDB is running
+  service:
+    name: mariadb
+    state: started
+    enabled: true
+
+- name: Set MariaDB root password (MariaDB-compatible)
+  shell: |
+    mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '{{ mysql_root_password_postfix  }}'; FLUSH PRIVILEGES;"
+  register: alter_root
+  ignore_errors: yes
+
+- name: Show output of setting root password
+  debug:
+    var: alter_root.stdout_lines
+
+- name: Show output of setting root password
+  debug:
+    var: alter_root.stdout_lines
+- name: Create database postfixadmin
+  mysql_db:
+    name: "{{ db_name_postfix }}"
+    state: present
+    login_user: root
+    login_password: "{{ mysql_root_password_postfix }}"
+
+- name: Create user for PostfixAdmin
+  mysql_user:
+    name: "{{ db_user_postfix }}"
+    password: "{{ db_password_postfix }}"
+    priv: "{{ db_name_postfix }}.*:ALL"
+    host: localhost
+    state: present
+    login_user: root
+    login_password: "{{ mysql_root_password_postfix }}"
+
+- name: Create database roundcubemail
+  mysql_db:
+    name: "{{ roundcube_db_name }}"
+    state: present
+    login_user: root
+    login_password: "{{ mysql_root_password_postfix }}"
+
+- name: Create user for Roundcube
+  mysql_user:
+    name: "{{ roundcube_db_user }}"
+    password: "{{ roundcube_db_password }}"
+    priv: "{{ roundcube_db_name }}.*:ALL"
+    host: localhost
+    state: present
+    login_user: root
+    login_password: "{{ mysql_root_password_postfix }}"

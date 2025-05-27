@@ -1,0 +1,33 @@
+- name: check /var/www
+  file:
+    path: /var/www
+    state: directory
+    mode: "0755"
+
+- name: Download PostfixAdmin
+  get_url:
+    url: https://github.com/postfixadmin/postfixadmin/archive/refs/tags/postfixadmin-3.3.13.tar.gz
+    dest: /var/www/postfixadmin-3.3.13.tar.gz
+    mode: "0644"
+
+- name: unpack /var/www
+  unarchive:
+    src: /var/www/postfixadmin-3.3.13.tar.gz
+    dest: /var/www
+    remote_src: yes
+
+- name: mv
+  shell: |
+    mv /var/www/postfixadmin-postfixadmin-3.3.13/* /var/www/postfixadmin/
+    mv /var/www/postfixadmin-postfixadmin-3.3.13/.* /var/www/postfixadmin/ || true
+  args:
+    executable: /bin/bash
+  become: true
+
+- name: Deploy PostfixAdmin config file
+  template:
+    src: config.inc.php.j2
+    dest: /var/www/postfixadmin/config.inc.php
+    owner: www-data
+    group: www-data
+    mode: "0640"

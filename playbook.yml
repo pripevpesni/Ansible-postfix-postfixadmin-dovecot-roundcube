@@ -1,0 +1,10 @@
+- name: Install 
+  hosts: mail
+  become: yes
+  roles:
+    - apache
+    - postfixadmin
+    - postfix
+    - mariadb
+    - roundcube
+    - dovecot

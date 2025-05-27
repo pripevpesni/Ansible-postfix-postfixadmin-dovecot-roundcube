@@ -1,0 +1,57 @@
+<?php
+
+$config = [];
+
+// Запретить доступ к инсталлятору после настройки
+$config['enable_installer'] = true;
+
+// Подключаем автоматическую конфигурацию базы (из debian-db-roundcube.php)
+include("/etc/roundcube/debian-db-roundcube.php");
+
+// ================= IMAP =================
+
+// Сервер IMAP для входящей почты
+$config['imap_host'] = 'localhost';
+$config['imap_port'] = 143;
+$config['default_port'] = 143;
+
+// ================= SMTP =================
+
+// Сервер SMTP для отправки почты
+$config['smtp_host'] = 'localhost';
+$config['smtp_port'] = 587;
+$config['smtp_user'] = '%u'; // Email пользователя
+$config['smtp_pass'] = '%p'; // Пароль пользователя
+$config['smtp_auth_type'] = 'LOGIN';
+$config['smtp_use_tls'] = true; // STARTTLS
+
+// Отключение проверки сертификатов для самоподписанных TLS-сертификатов
+$config['smtp_conn_options'] = [
+    'ssl' => [
+        'verify_peer'       => false,
+        'verify_peer_name'  => false,
+        'allow_self_signed' => true,
+    ],
+];
+
+// ================= Прочее =================
+
+// Название сервиса (отображается в интерфейсе)
+$config['product_name'] = 'Roundcube Webmail';
+
+// Ключ для шифрования паролей в сессии (ровно 24 символа!)
+$config['des_key'] = 'zy6WVIVRn65hq/SpSxFq15Or';
+
+// Отключить орфографию (если нет hunspell и т.п.)
+$config['enable_spellcheck'] = false;
+
+// Активные плагины (при необходимости)
+$config['plugins'] = [
+    // 'archive',
+    // 'zipdownload',
+];
+
+// Тема интерфейса
+$config['skin'] = 'elastic';
+
+?>

@@ -1,0 +1,14 @@
+
+driver = mysql
+connect = host=127.0.0.1 dbname={{ db_name_postfix }} user={{ db_user_postfix }} password={{ db_password_postfix }}
+
+default_pass_scheme = MD5-CRYPT
+
+password_query = \
+  SELECT username as user, password \
+  FROM mailbox WHERE username = '%u' AND active = 1;
+
+user_query = \
+  SELECT '/var/mail/vhosts/%d/%n' as home, 5000 AS uid, 5000 AS gid \
+  FROM mailbox WHERE username = '%u' AND active = 1;
+

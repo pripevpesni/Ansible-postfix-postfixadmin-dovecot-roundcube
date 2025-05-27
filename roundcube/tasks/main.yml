@@ -1,0 +1,62 @@
+- name: Install Apache
+  apt:
+    name:
+      - roundcube 
+      - roundcube-core 
+      - roundcube-mysql
+
+
+
+
+
+- name: cp config.inc.php.j2
+  template:
+    src: config.inc.php.j2
+    dest: /etc/roundcube/config.inc.php
+    owner: www-data
+    group: www-data
+    mode: "0644"
+
+
+
+- name: cp debian-db-roundcube.php.j2
+  template:
+    src: debian-db-roundcube.php.j2
+    dest: /etc/roundcube/debian-db-roundcube.php
+    owner: www-data
+    group: www-data
+    mode: "0644"
+
+
+
+- name: cp debian-db.php
+  template:
+    src: debian-db.php.j2
+    dest: /etc/roundcube/debian-db.php
+    owner: www-data
+    group: www-data
+    mode: "0644"
+
+
+- name: Add Roundcube Alias to Apache config
+  blockinfile:
+    path: /etc/apache2/sites-enabled/postfixadmin.conf
+    block: |
+      Alias /roundcube /usr/share/roundcube
+
+      <Directory /var/www/roundcube>
+          Options +FollowSymLinks
+          AllowOverride All
+          Require all granted
+      </Directory>
+    insertafter: EOF
+    marker: "# {mark} ANSIBLE ROUND CUBE ALIAS"
+  notify: Reload Apache
+
+- name: Import Roundcube database schema
+  mysql_db:
+    name: "{{ roundcube_db_name }}"
+    state: import
+    target: /usr/share/roundcube/SQL/mysql.initial.sql
+    login_user: "{{ roundcube_db_user }}"
+    login_password: "{{ roundcube_db_password }}"

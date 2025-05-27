@@ -1,0 +1,98 @@
+- name: Install Apache
+  apt:
+    name:
+      - postfix
+      - postfix-mysql
+
+- name: cp main.cf
+  template:
+    src: main.cf.j2
+    dest: /etc/postfix/main.cf
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Ensure vmail group exists
+  ansible.builtin.group:
+    name: vmail
+    gid: 5000
+    state: present
+
+- name: Ensure vmail user exists
+  ansible.builtin.user:
+    name: vmail
+    uid: 5000
+    group: vmail
+    shell: /usr/sbin/nologin
+    home: /var/mail
+    create_home: no
+    system: yes
+    state: present
+
+- name: cp master.cf.j2
+  template:
+    src: master.cf.j2
+    dest: /etc/postfix/master.cf
+    owner: root
+    group: root
+    mode: "0640"
+
+- name: cp mysql-virtual-alias-maps.cf.j2
+  template:
+    src: mysql-virtual-alias-maps.cf.j2
+    dest: /etc/postfix/mysql-virtual-alias-maps.cf
+    owner: root
+    group: root
+    mode: "0640"
+
+- name: cp mysql-virtual-domains.cf.j2
+  template:
+    src: mysql-virtual-domains.cf.j2
+    dest: /etc/postfix/mysql-virtual-domains.cf
+    owner: root
+    group: root
+    mode: "0640"
+
+- name: cp mysql-virtual-mailbox-maps.cf.j2
+  template:
+    src: mysql-virtual-mailbox-maps.cf.j2
+    dest: /etc/postfix/mysql-virtual-mailbox-maps.cf
+    owner: root
+    group: root
+    mode: "0640"
+
+- name: create directory /var/mail/vhosts
+  file:
+    path: /var/mail/vhosts
+    state: directory
+    recurse: yes
+
+- name: (UID и GID 5000)
+  file:
+    path: /var/mail/vhosts
+    owner: 5000
+    group: 5000
+    recurse: yes
+
+- name: /var/mail/vhosts
+  file:
+    path: /var/mail/vhosts
+    mode: "0770"
+    recurse: yes
+
+- name: Create Maildir directory structure for user
+  file:
+    path: "/var/mail/vhosts/"
+    state: directory
+    owner: vmail
+    group: vmail
+    mode: "0700"
+
+- name: Set /etc/mailname using shell and template variable
+  ansible.builtin.shell: echo "{{ mydomain }}" | tee /etc/mailname
+  become: true
+
+- name: restart Postfix
+  service:
+    name: postfix
+    state: restarted

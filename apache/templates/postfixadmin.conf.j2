@@ -1,0 +1,13 @@
+<VirtualHost *:80>
+ServerName {{ ip_hostname }}
+DocumentRoot /var/www/postfixadmin/public
+
+<Directory /var/www/postfixadmin/public>
+Options FollowSymLinks
+AllowOverride All
+Require all granted
+</Directory>
+
+ErrorLog ${APACHE_LOG_DIR}/postfixadmin_error.log
+CustomLog ${APACHE_LOG_DIR}/postfixadmin_access.log combined
+</VirtualHost>

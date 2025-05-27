@@ -1,0 +1,11 @@
+hostname: kd
+ip_hostname: 10.107.5.19
+mydomain: kd.local
+db_name_postfix: postfixadmin
+db_user_postfix: postfixadmin
+db_password_postfix: postfixadminpassword
+mysql_root_password_postfix: postfixadmin
+
+roundcube_db_name: roundcubemail
+roundcube_db_user: roundcube
+roundcube_db_password: roundcubepassword

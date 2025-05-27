@@ -1,0 +1,44 @@
+- name: Install Dovecot
+  apt:
+    name:
+      - dovecot-core
+      - dovecot-imapd
+      - dovecot-mysql
+      - dovecot-lmtpd
+
+- name: cp dovecot.conf
+  template:
+    src: dovecot.conf.j2
+    dest: /etc/dovecot/dovecot.conf
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: cp dovecot-sql.conf.ext.j2
+  template:
+    src: dovecot-sql.conf.ext.j2
+    dest: /etc/dovecot/dovecot-sql.conf.ext
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: cp 10-auth.conf.j2
+  template:
+    src: 10-auth.conf.j2
+    dest: /etc/dovecot/conf.d/10-auth.conf
+    owner: root
+    group: root
+    mode: "0640"
+
+- name: cp 10-master.conf.j2
+  template:
+    src: 10-master.conf.j2
+    dest: /etc/dovecot/conf.d/10-master.conf
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: restart Dovecot
+  service:
+    name: dovecot
+    state: restarted
